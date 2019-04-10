@@ -4,6 +4,8 @@ python_script=cnn_neural_network.py
 input_path=/home/dy121/tensorflow/pretrained_inception_v3/inception_v3.ckpt
 input_name=input
 output_name=InceptionV3/Predictions/Reshape_1
+QUANTIZATION_TFLITE=quantized_model.tflite
+CONVERT_TFLITE=convert_model.tflite
 
 pre_process() {
 	rm -rf ${name}
@@ -18,6 +20,12 @@ post_process() {
 
 	mv model.pb ${name}/${name}.pb 
 	mv opt_model.pb ${name}/opt_${name}.pb 
+
+	quantization_tflite ${name}/opt_${name}.pb
+	convert_tflite ${name}/opt_${name}.pb
+
+	mv ${QUANTIZATION_TFLITE} ${name}
+	mv ${CONVERT_TFLITE} ${name}
 }
 
 inception_v3_freeze() {

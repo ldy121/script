@@ -1,21 +1,24 @@
 #!/bin/sh
 
-TFLITE_CONVERT=/opt/tensorflow/bazel-bin/tensorflow/lite/python/tflite_convert
-OUTPUT_TFLITE=model.tflite
+TOCO=/opt/tensorflow/bazel-bin/tensorflow/lite/toco/toco
+QUANTIZATION_TFLITE=quantized_model.tflite
+CONVERT_TFLITE=convert_model.tflite
 
 tflite_quantization() {
 	pb_file=$1
 	input=$2
 	output=$3
 
-	${TFLITE_CONVERT} \
-		--output_file=${OUTPUT_TFLITE} \
-		--graph_def_file=${pb_file} \
+	${TOCO} \
+		--input_file=${pb_file} \
+		--output_file=${QUANTIZATION_TFLITE} \
 		--inference_type=QUANTIZED_UINT8 \
 		--input_arrays=${input} \
 		--output_arrays=${output} \
 		--mean_values=128 \
-		--std_dev_values=127
+		--std_dev_values=127 \
+		--default_ranges_min=0 \
+		--default_ranges_max=255
 }
 
 tflite_convert() {
@@ -23,9 +26,9 @@ tflite_convert() {
 	input=$2
 	output=$3
 
-	${TFLITE_CONVERT} \
-		--output_file=${OUTPUT_TFLITE} \
-		--graph_def_file=${pb_file} \
+	${TOCO} \
+		--input_file=${pb_file} \
+		--output_file=${CONVERT_TFLITE} \
 		--input_arrays=${input} \
 		--output_arrays=${output}
 }
